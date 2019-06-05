@@ -143,6 +143,23 @@ RCT_EXPORT_METHOD(getAvailableItems:(RCTPromiseResolveBlock)resolve
   [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
 }
 
+RCT_EXPORT_METHOD(getUnfinishedTransactions:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+  NSArray *pendingTrans = [[SKPaymentQueue defaultQueue] transactions];
+
+  NSMutableArray *items = [NSMutableArray arrayWithCapacity:pendingTrans.count];
+  for (int k = 0; k < pendingTrans.count; k++) {
+    SKPaymentTransaction *transaction = pendingTrans[k];
+
+    if (transaction.transactionState == SKPaymentTransactionStatePurchased) {
+      [items addObject:[self getPurchaseData:transaction]];
+    }
+  }
+
+  resolve(items);
+}
+
+
 RCT_EXPORT_METHOD(buyProduct:(NSString*)sku
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
