@@ -20,9 +20,9 @@
 @implementation RNIapIos
 
 -(instancetype)init {
+  NSLog(@"Purchase INIT module");
   if ((self = [super init])) {
     promisesByKey = [NSMutableDictionary dictionary];
-    [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
     [IAPPromotionObserver sharedObserver].delegate = self;
   }
   myQueue = dispatch_queue_create("reject", DISPATCH_QUEUE_SERIAL);
@@ -31,7 +31,9 @@
 }
 
 -(void) dealloc {
-  [[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
+  NSLog(@"Purchase SHUTDOWN module");
+
+  [self stopPaymentQueue];
 }
 
 +(BOOL)requiresMainQueueSetup {
@@ -44,6 +46,18 @@
 
 - (void)stopObserving {
   hasListeners = NO;
+}
+
+RCT_EXPORT_METHOD(startPaymentQueue:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+  NSLog(@"Purchase STARTING payment queue");
+  [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+  resolve(@YES);
+}
+
+-(void)stopPaymentQueue {
+  NSLog(@"Purchase STOPPING payment queue");
+  [[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
 }
 
 - (void)addListener:(NSString *)eventName {
