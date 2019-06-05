@@ -257,6 +257,11 @@ RCT_EXPORT_METHOD(buyProductWithoutAutoConfirm:(NSString*)sku
   }
 }
 
+RCT_EXPORT_METHOD(refreshTransactionStates) {
+  [self paymentQueue:[SKPaymentQueue defaultQueue] updatedTransactions:[[SKPaymentQueue defaultQueue] transactions]];
+}
+
+
 RCT_EXPORT_METHOD(finishTransaction) {
   NSLog(@"\n\n\n  finish Transaction  \n\n.");
   if (currentTransaction) {
