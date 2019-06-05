@@ -274,7 +274,11 @@ RCT_EXPORT_METHOD(clearTransaction) {
   NSArray *pendingTrans = [[SKPaymentQueue defaultQueue] transactions];
   NSLog(@"\n\n\n  ***  clear remaining Transactions. Call this before make a new transaction   \n\n.");
   for (int k = 0; k < pendingTrans.count; k++) {
-    [[SKPaymentQueue defaultQueue] finishTransaction:pendingTrans[k]];
+    SKPaymentTransaction *transaction = pendingTrans[k];
+
+    if (transaction.transactionState != SKPaymentTransactionStatePurchasing) {
+      [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+    }
   }
 }
 
