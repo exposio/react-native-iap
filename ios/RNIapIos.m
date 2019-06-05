@@ -414,11 +414,7 @@ RCT_EXPORT_METHOD(buyPromotedProduct:(RCTPromiseResolveBlock)resolve
   NSURL *receiptUrl = [[NSBundle mainBundle] appStoreReceiptURL];
   NSDictionary* purchase = [self getPurchaseData:transaction];
   [self resolvePromisesForKey:RCTKeyForInstance(transaction.payment.productIdentifier) value:purchase];
-
-  // additionally send event
-  if (hasListeners) {
-    [self sendEventWithName:@"iap-purchase-event" body: purchase];
-  }
+  [self sendEventWithName:@"iap-purchase-event" body: purchase];
 }
 
 -(NSString *)standardErrorCode:(int)code {
