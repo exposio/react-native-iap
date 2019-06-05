@@ -642,6 +642,7 @@ RCT_EXPORT_METHOD(buyPromotedProduct:(RCTPromiseResolveBlock)resolve
       transaction.transactionIdentifier, @"transactionId",
       transaction.payment.productIdentifier, @"productId",
       [receiptData base64EncodedStringWithOptions:0], @"transactionReceipt",
+      @(transaction.payment.quantity), @"quantity",
       nil
   ];
 
