@@ -348,25 +348,28 @@ RCT_EXPORT_METHOD(buyPromotedProduct:(RCTPromiseResolveBlock)resolve
 }
 
 -(void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions {
+  NSLog(@"got updatedTransactions");
   for (SKPaymentTransaction *transaction in transactions) {
+    NSLog(@"transaction %@ in state %ld", transaction, (long)transaction.transactionState);
     switch (transaction.transactionState) {
       case SKPaymentTransactionStatePurchasing:
-        NSLog(@"\n\n Purchase Started !! \n\n");
+        NSLog(@"Purchase Started !! SKPaymentTransactionStatePurchasing");
         break;
       case SKPaymentTransactionStatePurchased:
-        NSLog(@"\n\n\n\n\n Purchase Successful !! \n\n\n\n\n.");
+        NSLog(@"Purchase Successful !! SKPaymentTransactionStatePurchased");
         [self purchaseProcess:transaction];
         break;
       case SKPaymentTransactionStateRestored: // 기존 구매한 아이템 복구..
-        NSLog(@"Restored ");
+        NSLog(@"Purchase Restored SKPaymentTransactionStateRestored");
         [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
         break;
       case SKPaymentTransactionStateDeferred:
-        NSLog(@"Deferred (awaiting approval via parental controls, etc.)");
+        NSLog(@"Purchase Deferred (awaiting approval via parental controls, etc.) SKPaymentTransactionStateDeferred");
         break;
       case SKPaymentTransactionStateFailed:
-        NSLog(@"\n\n\n\n\n\n Purchase Failed  !! \n\n\n\n\n");
+        NSLog(@"Purchase Failed !! SKPaymentTransactionStateFailed");
         [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+
         NSString *key = RCTKeyForInstance(transaction.payment.productIdentifier);
         dispatch_sync(myQueue, ^{
           [self rejectPromisesForKey:key code:[self standardErrorCode:(int)transaction.error.code]
