@@ -173,8 +173,8 @@ RCT_EXPORT_METHOD(buyProduct:(NSString*)sku
   }
   if (product) {
     SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
-    [[SKPaymentQueue defaultQueue] addPayment:payment];
     [self addPromiseForKey:RCTKeyForInstance(payment.productIdentifier) resolve:resolve reject:reject];
+    [[SKPaymentQueue defaultQueue] addPayment:payment];
   } else {
     reject(@"E_DEVELOPER_ERROR", @"Invalid product ID.", nil);
   }
@@ -229,8 +229,8 @@ RCT_EXPORT_METHOD(buyProductWithQuantityIOS:(NSString*)sku
   if (product) {
     SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
     payment.quantity = quantity;
-    [[SKPaymentQueue defaultQueue] addPayment:payment];
     [self addPromiseForKey:RCTKeyForInstance(payment.productIdentifier) resolve:resolve reject:reject];
+    [[SKPaymentQueue defaultQueue] addPayment:payment];
   } else {
     reject(@"E_DEVELOPER_ERROR", @"Invalid product ID.", nil);
   }
@@ -250,8 +250,8 @@ RCT_EXPORT_METHOD(buyProductWithoutAutoConfirm:(NSString*)sku
   }
   if (product) {
     SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
-    [[SKPaymentQueue defaultQueue] addPayment:payment];
     [self addPromiseForKey:RCTKeyForInstance(payment.productIdentifier) resolve:resolve reject:reject];
+    [[SKPaymentQueue defaultQueue] addPayment:payment];
   } else {
     reject(@"E_DEVELOPER_ERROR", @"Invalid product ID.", nil);
   }
