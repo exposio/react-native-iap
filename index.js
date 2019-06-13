@@ -390,6 +390,14 @@ export const addAdditionalSuccessPurchaseListenerIOS = (e) => {
   }
 };
 
+export const startPaymentQueue = () => Platform.select({
+  ios: async() => {
+    checkNativeiOSAvailable();
+    return RNIapIos.startPaymentQueue();
+  },
+  android: async() => Promise.resolve(),
+})();
+
 /**
  * deprecagted codes
  */
@@ -443,4 +451,5 @@ export default {
   validateReceiptIos,
   validateReceiptAndroid,
   addAdditionalSuccessPurchaseListenerIOS,
+  startPaymentQueue
 };
