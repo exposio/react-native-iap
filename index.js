@@ -398,6 +398,14 @@ export const startPaymentQueue = () => Platform.select({
   android: async() => Promise.resolve(),
 })();
 
+export const refreshTransactionStates = () => Platform.select({
+  ios: async() => {
+    checkNativeiOSAvailable();
+    return RNIapIos.refreshTransactionStates();
+  },
+  android: async() => Promise.resolve(),
+})();
+
 /**
  * deprecagted codes
  */
@@ -451,5 +459,6 @@ export default {
   validateReceiptIos,
   validateReceiptAndroid,
   addAdditionalSuccessPurchaseListenerIOS,
-  startPaymentQueue
+  startPaymentQueue,
+  refreshTransactionStates
 };
