@@ -220,14 +220,13 @@ RCT_EXPORT_METHOD(buyProductWithQuantityIOS:(NSString*)sku
   NSLog(@"\n\n\n  buyProductWithQuantityIOS  \n\n.");
   autoReceiptConform = true;
   SKProduct *product;
-  @synchronized (validProducts) {
-    for (SKProduct *p in validProducts) {
-      if([sku isEqualToString:p.productIdentifier]) {
-        product = p;
-        break;
-      }
+  for (SKProduct *p in validProducts) {
+    if([sku isEqualToString:p.productIdentifier]) {
+      product = p;
+      break;
     }
   }
+
   if (product) {
     SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
     payment.quantity = quantity;
@@ -327,20 +326,18 @@ RCT_EXPORT_METHOD(buyPromotedProduct:(RCTPromiseResolveBlock)resolve
 // Add to valid products from Apple server response. Allowing getProducts, getSubscriptions call several times.
 // Doesn't allow duplication. Replace new product.
 -(void)addProduct:(SKProduct *)aProd {
-  @synchronized (validProducts) {
-    NSLog(@"\n  Add new object : %@", aProd.productIdentifier);
-    int delTar = -1;
-    for (int k = 0; k < validProducts.count; k++) {
-      SKProduct *cur = validProducts[k];
-      if ([cur.productIdentifier isEqualToString:aProd.productIdentifier]) {
-        delTar = k;
-      }
+  NSLog(@"\n  Add new object : %@", aProd.productIdentifier);
+  int delTar = -1;
+  for (int k = 0; k < validProducts.count; k++) {
+    SKProduct *cur = validProducts[k];
+    if ([cur.productIdentifier isEqualToString:aProd.productIdentifier]) {
+      delTar = k;
     }
-    if (delTar >= 0) {
-      [validProducts removeObjectAtIndex:delTar];
-    }
-    [validProducts addObject:aProd];
   }
+  if (delTar >= 0) {
+    [validProducts removeObjectAtIndex:delTar];
+  }
+  [validProducts addObject:aProd];
 }
 
 - (void)request:(SKRequest *)request didFailWithError:(NSError *)error{
