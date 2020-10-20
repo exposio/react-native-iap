@@ -220,16 +220,18 @@ RCT_EXPORT_METHOD(buyProductWithQuantityIOS:(NSString*)sku
   NSLog(@"\n\n\n  buyProductWithQuantityIOS  \n\n.");
   autoReceiptConform = true;
   SKProduct *product;
-  for (SKProduct *p in validProducts) {
-    if([sku isEqualToString:p.productIdentifier]) {
-      product = p;
-      break;
+  @synchronized (validProducts) {
+    for (SKProduct *p in validProducts) {
+      if([sku isEqualToString:p.productIdentifier]) {
+        product = p;
+        break;
+      }
     }
   }
   if (product) {
     SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
     payment.quantity = quantity;
-    [self addPromiseForKey:RCTKeyForInstance(payment.productIdentifier) resolve:resolve reject:reject];
+    [self addPromiseForKey:payment.productIdentifier resolve:resolve reject:reject];
     [[SKPaymentQueue defaultQueue] addPayment:payment];
   } else {
     reject(@"E_DEVELOPER_ERROR", @"Invalid product ID.", nil);
@@ -325,18 +327,20 @@ RCT_EXPORT_METHOD(buyPromotedProduct:(RCTPromiseResolveBlock)resolve
 // Add to valid products from Apple server response. Allowing getProducts, getSubscriptions call several times.
 // Doesn't allow duplication. Replace new product.
 -(void)addProduct:(SKProduct *)aProd {
-  NSLog(@"\n  Add new object : %@", aProd.productIdentifier);
-  int delTar = -1;
-  for (int k = 0; k < validProducts.count; k++) {
-    SKProduct *cur = validProducts[k];
-    if ([cur.productIdentifier isEqualToString:aProd.productIdentifier]) {
-      delTar = k;
+  @synchronized (validProducts) {
+    NSLog(@"\n  Add new object : %@", aProd.productIdentifier);
+    int delTar = -1;
+    for (int k = 0; k < validProducts.count; k++) {
+      SKProduct *cur = validProducts[k];
+      if ([cur.productIdentifier isEqualToString:aProd.productIdentifier]) {
+        delTar = k;
+      }
     }
+    if (delTar >= 0) {
+      [validProducts removeObjectAtIndex:delTar];
+    }
+    [validProducts addObject:aProd];
   }
-  if (delTar >= 0) {
-    [validProducts removeObjectAtIndex:delTar];
-  }
-  [validProducts addObject:aProd];
 }
 
 - (void)request:(SKRequest *)request didFailWithError:(NSError *)error{
@@ -413,7 +417,7 @@ RCT_EXPORT_METHOD(buyPromotedProduct:(RCTPromiseResolveBlock)resolve
   }
   NSURL *receiptUrl = [[NSBundle mainBundle] appStoreReceiptURL];
   NSDictionary* purchase = [self getPurchaseData:transaction];
-  [self resolvePromisesForKey:RCTKeyForInstance(transaction.payment.productIdentifier) value:purchase];
+  [self resolvePromisesForKey:transaction.payment.productIdentifier value:purchase];
   [self sendEventWithName:@"iap-purchase-event" body: purchase];
 }
 
